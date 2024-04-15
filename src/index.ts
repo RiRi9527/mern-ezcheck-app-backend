@@ -26,8 +26,8 @@ app.use(
   })
 );
 
-app.get("/api/test", async (req: Request, res: Response) => {
-  res.json({ message: "Hello World!" });
+app.get("/health", async (req: Request, res: Response) => {
+  res.send({ message: "health OK!" });
 });
 
 app.use("/api/users", userRoutes);
