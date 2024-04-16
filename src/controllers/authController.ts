@@ -27,11 +27,10 @@ const authLogin = async (req: Request, res: Response) => {
 
     res.cookie("auth_token", token, {
       httpOnly: true,
-      // secure: process.env.NODE_ENV === "production",
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       maxAge: 86400000,
       domain: process.env.COOKIE_DOMAIN, // set to your main domain with a leading dot, i.e. '.onrender.com'
-      sameSite: "none", // if you want to ensure cookies are sent in all contexts
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // if you want to ensure cookies are sent in all contexts
     });
 
     return res.status(200).json({ userId: user._id });
