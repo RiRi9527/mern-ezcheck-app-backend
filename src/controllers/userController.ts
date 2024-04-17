@@ -19,6 +19,12 @@ const getCurrentUser = async (req: Request, res: Response) => {
 
 const createCurrentUser = async (req: Request, res: Response) => {
   try {
+    const auth = await User.findById(req.userId);
+
+    if (auth?.position !== "CEO" && auth?.position !== "Office Manager") {
+      return res.status(403).json({ message: "No permission" });
+    }
+
     const existingUser = await User.findOne({
       userName: req.body.userName,
     });
@@ -45,6 +51,12 @@ const createCurrentUser = async (req: Request, res: Response) => {
 
 const editCurrentUser = async (req: Request, res: Response) => {
   try {
+    const auth = await User.findById(req.userId);
+
+    if (auth?.position !== "CEO" && auth?.position !== "Office Manager") {
+      return res.status(403).json({ message: "No permission" });
+    }
+
     const userIdParam = req.params.userParamsId;
     const user = await User.findById(userIdParam);
 
