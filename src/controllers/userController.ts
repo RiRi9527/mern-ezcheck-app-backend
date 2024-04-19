@@ -4,7 +4,19 @@ import cloudinary from "cloudinary";
 
 const getCurrentUser = async (req: Request, res: Response) => {
   try {
+    const auth = await User.findById(req.userId);
+
     const userIdParam = req.params.userParamsId;
+
+    if (
+      userIdParam !== req.userId &&
+      auth?.position !== "CEO" &&
+      auth?.position !== "Office Manager"
+    ) {
+      return res.status(403).json({ message: "No permission" });
+    }
+
+    // check up code works and no bugs later
 
     const user = await User.findById(userIdParam);
     if (!user) {
