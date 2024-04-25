@@ -4,6 +4,8 @@ import "dotenv/config";
 import mongoose from "mongoose";
 import userRoutes from "./routes/users";
 import authRoutes from "./routes/auth";
+import attendanceRoutes from "./routes/attendance";
+
 import { v2 as cloudinary } from "cloudinary";
 import cookieParser from "cookie-parser";
 
@@ -32,6 +34,7 @@ app.get("/health", async (req: Request, res: Response) => {
 
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/attendance", attendanceRoutes);
 
 app.listen(7000, () => {
   console.log("server running on the localhost: 7000");
