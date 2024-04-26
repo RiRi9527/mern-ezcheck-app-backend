@@ -1,21 +1,33 @@
 import { Request, Response } from "express";
 import Attendance from "../models/attendance";
+import createAttendanceModel from "../models/attendanceByUserId";
 
 const createAttendance = async (req: Request, res: Response) => {
   try {
-    const { employeeId, date } = req.body; // Assuming the request body contains employee ID and date
+    const userIdParam = req.params.userParamsId;
+    const AttendanceSchema = createAttendanceModel(userIdParam);
 
-    // Find attendance record for a specific employee ID and date
-    const existingAttendance = await Attendance.findOne({ employeeId, date });
+    const existingAttendance = await AttendanceSchema.findOne({
+      date: req.body.date,
+    });
 
-    // If there is already an attendance record, return "already checkIn"
     if (existingAttendance) {
-      return res.status(400).json({ message: "Already checkIn" });
+      existingAttendance.schedule_start_time.push(req.body.schedule_start_time);
+      existingAttendance.schedule_end_time.push(req.body.schedule_end_time);
+      existingAttendance.check_ins.push(req.body.check_in_time);
+      existingAttendance.check_outs.push(req.body.check_out_time);
+      existingAttendance.temporarily_leave_returns.push({
+        leave_time: req.body.leave_time,
+        return_time: req.body.return_time,
+        location: req.body.location,
+      });
+      await existingAttendance.save();
+      return res.sendStatus(200);
+    } else {
+      const attendance = new AttendanceSchema(req.body);
+      await attendance.save();
+      return res.sendStatus(200);
     }
-
-    // Otherwise, create a new attendance record
-    const newAttendance = new Attendance(req.body);
-    await newAttendance.save();
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: `Error creating attendance` });
