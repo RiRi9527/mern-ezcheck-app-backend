@@ -10,8 +10,8 @@ export function createBigReactCalendarEventModel(
   employeeId: string
 ): mongoose.Model<BigReactCalendarEvent> {
   const attendanceSchema = new mongoose.Schema({
-    title: { type: String, require: true },
-    startTime: { type: Date, require: true },
+    title: { type: String },
+    startTime: { type: Date },
     endTime: { type: Date },
   });
 

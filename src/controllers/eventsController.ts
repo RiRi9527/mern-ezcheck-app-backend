@@ -36,6 +36,46 @@ const createEvent = () => async (req: Request, res: Response) => {
   }
 };
 
+const editEvent = () => async (req: Request, res: Response) => {
+  try {
+    const auth = await User.findById(req.userId);
+    const userIdParam = req.params.userParamsId;
+    if (
+      userIdParam !== req.userId &&
+      auth?.position !== "CEO" &&
+      auth?.position !== "Office Manager"
+    ) {
+      return res.status(403).json({ message: "No permission" });
+    }
+    // check authorization
+
+    const eventIdParam = req.params.eventParamsId;
+    const Event = createBigReactCalendarEventModel(userIdParam);
+    const existingEvent = await Event.findById(eventIdParam);
+
+    if (!existingEvent) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    if (req.body.title) {
+      existingEvent.title = req.body.title;
+    }
+    if (req.body.startTime) {
+      existingEvent.startTime = req.body.startTime;
+    }
+    if (req.body.endTime) {
+      existingEvent.endTime = req.body.endTime;
+    }
+
+    await existingEvent.save();
+    return res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: `Error Edit Event` });
+  }
+};
+
 export default {
   createEvent,
+  editEvent,
 };
