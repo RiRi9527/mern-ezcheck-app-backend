@@ -1,4 +1,3 @@
-import { ObjectId } from "mongodb";
 import mongoose, { Document } from "mongoose";
 
 export interface AttendanceType extends Document {
