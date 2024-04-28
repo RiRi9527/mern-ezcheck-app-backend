@@ -1,57 +1,33 @@
 import { Request, Response } from "express";
-import User from "../models/user";
 import createBigReactCalendarEventModel from "../models/bigReactCalendarEvent";
 
-const createEvent = () => async (req: Request, res: Response) => {
+const getEvent = async (req: Request, res: Response) => {
+  res.sendStatus(200);
+};
+
+const createEvent = async (req: Request, res: Response) => {
   try {
-    const auth = await User.findById(req.userId);
-
-    const userIdParam = req.params.userParamsId;
-
-    if (
-      userIdParam !== req.userId &&
-      auth?.position !== "CEO" &&
-      auth?.position !== "Office Manager"
-    ) {
-      return res.status(403).json({ message: "No permission" });
-    }
-    // check authorization
-
-    const Event = createBigReactCalendarEventModel(userIdParam);
-
-    const existingEvent = await Event.findById(req.body._id);
-
+    const userIdParam = req.params.userIdParam;
+    const EventModel = createBigReactCalendarEventModel(userIdParam);
+    const existingEvent = await EventModel.findById(req.body._id);
     if (existingEvent) {
       return res.status(409).json({ message: "Event already exists" });
     }
-
-    const event = new Event(req.body);
-
+    const event = new EventModel(req.body);
     await event.save();
-
-    return res.status(200);
+    return res.sendStatus(200);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: `Error Create Event` });
+    return res.status(500).json({ message: `Error Create Event` });
   }
 };
 
-const editEvent = () => async (req: Request, res: Response) => {
+const editEvent = async (req: Request, res: Response) => {
   try {
-    const auth = await User.findById(req.userId);
-    const userIdParam = req.params.userParamsId;
-    if (
-      userIdParam !== req.userId &&
-      auth?.position !== "CEO" &&
-      auth?.position !== "Office Manager"
-    ) {
-      return res.status(403).json({ message: "No permission" });
-    }
-    // check authorization
-
-    const eventIdParam = req.params.eventParamsId;
-    const Event = createBigReactCalendarEventModel(userIdParam);
-    const existingEvent = await Event.findById(eventIdParam);
+    const userIdParam = req.params.userIdParam;
+    const eventIdParam = req.params.eventIdParam;
+    const EventModel = createBigReactCalendarEventModel(userIdParam);
+    const existingEvent = await EventModel.findById(eventIdParam);
 
     if (!existingEvent) {
       return res.status(404).json({ message: "Event not found" });
@@ -78,4 +54,5 @@ const editEvent = () => async (req: Request, res: Response) => {
 export default {
   createEvent,
   editEvent,
+  getEvent,
 };

@@ -3,6 +3,7 @@ import multer from "multer";
 import userController from "../controllers/userController";
 import { validateMyUserRequest } from "../middleware/validation";
 import verifyToken from "../middleware/verifyToken";
+import verifyAuth from "../middleware/verifyAuth";
 
 const router = express.Router();
 
@@ -14,11 +15,17 @@ const upload = multer({
   },
 });
 
-router.get("/:userParamsId", verifyToken, userController.getCurrentUser);
+router.get(
+  "/:userParamsId",
+  verifyToken,
+  verifyAuth,
+  userController.getCurrentUser
+);
 
 router.post(
   "/register",
   verifyToken,
+  verifyAuth,
   upload.single("imageFile"),
   validateMyUserRequest,
   userController.createCurrentUser
@@ -27,6 +34,7 @@ router.post(
 router.put(
   "/:userParamsId",
   verifyToken,
+  verifyAuth,
   upload.single("imageFile"),
   validateMyUserRequest,
   userController.editCurrentUser

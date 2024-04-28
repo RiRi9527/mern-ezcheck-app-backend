@@ -4,10 +4,9 @@ import "dotenv/config";
 import mongoose from "mongoose";
 import userRoutes from "./routes/users";
 import authRoutes from "./routes/auth";
-
+import eventsRoutes from "./routes/events";
 import { v2 as cloudinary } from "cloudinary";
 import cookieParser from "cookie-parser";
-import eventsRoutes from "./routes/eventsRoutes";
 
 mongoose.connect(process.env.MONGODB_CONNECTION_STRING as string);
 

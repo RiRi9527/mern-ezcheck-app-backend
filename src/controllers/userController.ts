@@ -4,20 +4,7 @@ import cloudinary from "cloudinary";
 
 const getCurrentUser = async (req: Request, res: Response) => {
   try {
-    const auth = await User.findById(req.userId);
-
     const userIdParam = req.params.userParamsId;
-
-    if (
-      userIdParam !== req.userId &&
-      auth?.position !== "CEO" &&
-      auth?.position !== "Office Manager"
-    ) {
-      return res.status(403).json({ message: "No permission" });
-    }
-
-    // check up code works and no bugs later
-
     const user = await User.findById(userIdParam);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -31,12 +18,6 @@ const getCurrentUser = async (req: Request, res: Response) => {
 
 const createCurrentUser = async (req: Request, res: Response) => {
   try {
-    const auth = await User.findById(req.userId);
-
-    if (auth?.position !== "CEO" && auth?.position !== "Office Manager") {
-      return res.status(403).json({ message: "No permission" });
-    }
-
     const existingUser = await User.findOne({
       userName: req.body.userName,
     });
@@ -63,12 +44,6 @@ const createCurrentUser = async (req: Request, res: Response) => {
 
 const editCurrentUser = async (req: Request, res: Response) => {
   try {
-    const auth = await User.findById(req.userId);
-
-    if (auth?.position !== "CEO" && auth?.position !== "Office Manager") {
-      return res.status(403).json({ message: "No permission" });
-    }
-
     const userIdParam = req.params.userParamsId;
     const user = await User.findById(userIdParam);
 
