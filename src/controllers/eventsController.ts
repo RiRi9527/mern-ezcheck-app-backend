@@ -56,3 +56,16 @@ export default {
   editEvent,
   getEvent,
 };
+
+// const updatedAttendance = await Attendance.findOneAndUpdate(
+//   {
+//     startTime: { $gte: today },
+//     endTime: { $exists: false },
+//   },
+//   {
+//     endTime: new Date().toLocaleTimeString(),
+//   },
+//   {
+//     new: true, // 返回更新后的文档
+//   }
+// );
