@@ -2,7 +2,22 @@ import { Request, Response } from "express";
 import createBigReactCalendarEventModel from "../models/bigReactCalendarEvent";
 
 const getEvent = async (req: Request, res: Response) => {
-  res.sendStatus(200);
+  try {
+    // Extract userIdParam from request parameters
+    const userIdParam = req.params.userIdParam;
+    // Create EventModel based on userIdParam
+    const EventModel = createBigReactCalendarEventModel(userIdParam);
+
+    // Retrieve all events that match the condition
+    const events = await EventModel.find();
+
+    // Send the event data back to the client
+    res.status(200).json(events);
+  } catch (error) {
+    // If an error occurs, send an appropriate error response
+    console.log(error);
+    res.status(500).json({ error: "Error fetch events" });
+  }
 };
 
 const createEvent = async (req: Request, res: Response) => {
