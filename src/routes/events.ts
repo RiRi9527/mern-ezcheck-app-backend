@@ -7,6 +7,8 @@ const router = express.Router();
 router.get("/:userIdParam", eventsController.getEvent);
 router.post("/:userIdParam", eventsController.createEvent);
 
-router.put("/:userIdParam/:eventIdParam", eventsController.editEvent);
+router.put("/:userIdParam", eventsController.editEvent);
+
+router.delete("/:userIdParam", eventsController.deleteEvent);
 
 export default router;
