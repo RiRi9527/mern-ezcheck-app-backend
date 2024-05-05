@@ -83,11 +83,46 @@ const deleteEvent = async (req: Request, res: Response) => {
   }
 };
 
+const createCheckInEvent = async (req: Request, res: Response) => {
+  try {
+    const userIdParam = req.params.userIdParam;
+    const EventModel = createBigReactCalendarEventModel(userIdParam);
+
+    // 获取请求中的日期
+    const startTime = new Date(req.body.startTime);
+    // 设置当天开始时间
+    startTime.setHours(0, 0, 0, 0);
+    // // 设置当天结束时间
+    // const endTime = new Date(startTime);
+    // endTime.setHours(23, 59, 59, 999);
+
+    // 查询当天的“Actual Time”事件
+    const existingEvent = await EventModel.findOne({
+      title: "Actual Time",
+      startTime: { $gte: startTime.toString() },
+      endTime: { $exists: false },
+    });
+
+    if (existingEvent) {
+      return res.status(409).json({ message: "User already checked in" });
+    }
+
+    const event = new EventModel(req.body);
+
+    await event.save();
+    return res.status(200).json(event._id);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: `Error Create Event` });
+  }
+};
+
 export default {
   createEvent,
   editEvent,
   getEvent,
   deleteEvent,
+  createCheckInEvent,
 };
 
 // const updatedAttendance = await Attendance.findOneAndUpdate(

@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.get("/:userIdParam", eventsController.getEvent);
 router.post("/:userIdParam", eventsController.createEvent);
+router.post("/:userIdParam/checkIn", eventsController.createCheckInEvent);
 
 router.put("/:userIdParam", eventsController.editEvent);
 
