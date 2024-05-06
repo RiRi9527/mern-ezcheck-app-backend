@@ -9,6 +9,7 @@ router.post("/:userIdParam", eventsController.createEvent);
 router.post("/:userIdParam/checkIn", eventsController.createCheckInEvent);
 
 router.put("/:userIdParam", eventsController.editEvent);
+router.put("/:userIdParam/checkOut", eventsController.createCheckOutEvent);
 
 router.delete("/:userIdParam", eventsController.deleteEvent);
 

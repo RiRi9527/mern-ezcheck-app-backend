@@ -89,9 +89,9 @@ const createCheckInEvent = async (req: Request, res: Response) => {
     const EventModel = createBigReactCalendarEventModel(userIdParam);
 
     // 获取请求中的日期
-    const startTime = new Date(req.body.startTime);
+    const currentDay = new Date(req.body.startTime);
     // 设置当天开始时间
-    startTime.setHours(0, 0, 0, 0);
+    currentDay.setHours(0, 0, 0, 0);
     // // 设置当天结束时间
     // const endTime = new Date(startTime);
     // endTime.setHours(23, 59, 59, 999);
@@ -99,7 +99,7 @@ const createCheckInEvent = async (req: Request, res: Response) => {
     // 查询当天的“Actual Time”事件
     const existingEvent = await EventModel.findOne({
       title: "Actual Time",
-      startTime: { $gte: startTime.toString() },
+      startTime: { $gte: currentDay.toString() },
       endTime: { $exists: false },
     });
 
@@ -117,12 +117,49 @@ const createCheckInEvent = async (req: Request, res: Response) => {
   }
 };
 
+const createCheckOutEvent = async (req: Request, res: Response) => {
+  try {
+    const userIdParam = req.params.userIdParam;
+    const EventModel = createBigReactCalendarEventModel(userIdParam);
+
+    // 获取请求中的日期
+    const currentDay = new Date(req.body.endTime);
+    // 设置当天开始时间
+    currentDay.setHours(0, 0, 0, 0);
+    // // 设置当天结束时间
+    // const endTime = new Date(startTime);
+    // endTime.setHours(23, 59, 59, 999);
+
+    // 查询当天的“Actual Time”事件
+    const existingEvent = await EventModel.findOne({
+      title: "Actual Time",
+      startTime: { $gte: currentDay.toString() },
+      endTime: { $exists: false },
+    });
+
+    if (!existingEvent) {
+      return res.status(409).json({ message: "User has not checked in" });
+    }
+
+    if (req.body.endTime) {
+      existingEvent.endTime = req.body.endTime;
+    }
+
+    await existingEvent.save();
+    return res.status(200).json(existingEvent._id);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: `Error Create Event` });
+  }
+};
+
 export default {
   createEvent,
   editEvent,
   getEvent,
   deleteEvent,
   createCheckInEvent,
+  createCheckOutEvent,
 };
 
 // const updatedAttendance = await Attendance.findOneAndUpdate(
