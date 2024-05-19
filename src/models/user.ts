@@ -8,9 +8,40 @@ export type UserType = {
   lastName: string;
   position: string;
   hourlyWage: number;
-  isAdmin: boolean;
+  working: boolean;
   imageUrl?: string;
+  schedule?: {
+    monday?: { checkIn: string; checkOut: string };
+    tuesday?: { checkIn: string; checkOut: string };
+    wednesday?: { checkIn: string; checkOut: string };
+    thursday?: { checkIn: string; checkOut: string };
+    friday?: { checkIn: string; checkOut: string };
+    saturday?: { checkIn: string; checkOut: string };
+    sunday?: { checkIn: string; checkOut: string };
+  };
 };
+
+// Define the sub-schema for the schedule
+const dayScheduleSchema = new mongoose.Schema(
+  {
+    checkIn: { type: String, required: true },
+    checkOut: { type: String, required: true },
+  },
+  { _id: false }
+);
+
+const scheduleSchema = new mongoose.Schema(
+  {
+    monday: { type: dayScheduleSchema },
+    tuesday: { type: dayScheduleSchema },
+    wednesday: { type: dayScheduleSchema },
+    thursday: { type: dayScheduleSchema },
+    friday: { type: dayScheduleSchema },
+    saturday: { type: dayScheduleSchema },
+    sunday: { type: dayScheduleSchema },
+  },
+  { _id: false }
+);
 
 const userSchema = new mongoose.Schema({
   userName: { type: String, required: true, unique: true },
@@ -19,8 +50,9 @@ const userSchema = new mongoose.Schema({
   lastName: { type: String, required: true },
   position: { type: String, required: true },
   hourlyWage: { type: Number, required: true },
-  isAdmin: { type: Boolean, default: false },
+  working: { type: Boolean, default: false },
   imageUrl: { type: String },
+  schedule: { type: scheduleSchema },
 });
 
 const User = mongoose.model<UserType>("User", userSchema);

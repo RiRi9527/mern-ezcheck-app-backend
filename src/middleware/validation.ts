@@ -38,10 +38,6 @@ export const validateMyUserRequest = [
     .isNumeric()
     .notEmpty()
     .withMessage("hourlyWage must be a number"),
-  body("isAdmin")
-    .isBoolean()
-    .notEmpty()
-    .withMessage("isAdmin must be a boolean"),
   handleValidationErrors,
   body("imageUrl")
     .isString()

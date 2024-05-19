@@ -40,4 +40,6 @@ router.put(
   userController.editCurrentUser
 );
 
+router.put("/:userParamsId/schedule", userController.editCurrentUserSchedule);
+
 export default router;

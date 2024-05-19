@@ -28,6 +28,15 @@ const createCurrentUser = async (req: Request, res: Response) => {
 
     const user = new User(req.body);
 
+    // Set default schedule for Monday to Friday
+    user.schedule = {
+      monday: { checkIn: "09:00", checkOut: "17:00" },
+      tuesday: { checkIn: "09:00", checkOut: "17:00" },
+      wednesday: { checkIn: "09:00", checkOut: "17:00" },
+      thursday: { checkIn: "09:00", checkOut: "17:00" },
+      friday: { checkIn: "09:00", checkOut: "17:00" },
+    };
+
     if (req.file) {
       const imageUrl = await uploadImage(req.file as Express.Multer.File);
       user.imageUrl = imageUrl;
@@ -57,11 +66,33 @@ const editCurrentUser = async (req: Request, res: Response) => {
     user.lastName = req.body.lastName;
     user.position = req.body.position;
     user.hourlyWage = req.body.hourlyWage;
-    user.isAdmin = req.body.isAdmin;
+
     if (req.file) {
       const imageUrl = await uploadImage(req.file as Express.Multer.File);
       user.imageUrl = imageUrl;
     }
+    await user.save();
+
+    return res.status(200).send(user);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: `Error changing user` });
+  }
+};
+
+const editCurrentUserSchedule = async (req: Request, res: Response) => {
+  try {
+    const userIdParam = req.params.userParamsId;
+    const user = await User.findById(userIdParam);
+
+    if (!user) {
+      return res.status(409).json({ message: "User not found" });
+    }
+
+    if (req.body) {
+      user.schedule = req.body;
+    }
+
     await user.save();
 
     return res.status(200).send(user);
@@ -84,4 +115,5 @@ export default {
   createCurrentUser,
   getCurrentUser,
   editCurrentUser,
+  editCurrentUserSchedule,
 };
