@@ -40,6 +40,11 @@ router.put(
   userController.editCurrentUser
 );
 
-router.put("/:userParamsId/schedule", userController.editCurrentUserSchedule);
+router.put(
+  "/:userParamsId/schedule",
+  verifyToken,
+  verifyAuth,
+  userController.editCurrentUserSchedule
+);
 
 export default router;
