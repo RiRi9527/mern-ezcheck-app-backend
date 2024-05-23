@@ -73,7 +73,7 @@ const editCurrentUser = async (req: Request, res: Response) => {
     }
     await user.save();
 
-    return res.status(200).send(user);
+    return res.status(200).json(user._id);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: `Error changing user` });
