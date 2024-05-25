@@ -28,8 +28,8 @@ import mongoose, { Document, Model } from "mongoose";
 
 export interface BigReactCalendarEvent extends Document {
   title: string;
-  startTime: string;
-  endTime: string;
+  start: string;
+  end: string;
 }
 
 const BigReactCalendarEventModelMap: {
@@ -48,8 +48,8 @@ export const createBigReactCalendarEventModel = (
 
   const attendanceSchema = new mongoose.Schema({
     title: { type: String, require: true },
-    startTime: { type: String },
-    endTime: { type: String },
+    start: { type: String },
+    end: { type: String },
   });
 
   // Create a model and store it in a model map

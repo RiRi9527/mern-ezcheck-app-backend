@@ -50,11 +50,11 @@ const editEvent = async (req: Request, res: Response) => {
     if (req.body.title) {
       existingEvent.title = req.body.title;
     }
-    if (req.body.startTime) {
-      existingEvent.startTime = req.body.startTime;
+    if (req.body.start) {
+      existingEvent.start = req.body.start;
     }
-    if (req.body.endTime) {
-      existingEvent.endTime = req.body.endTime;
+    if (req.body.end) {
+      existingEvent.end = req.body.end;
     }
 
     await existingEvent.save();
@@ -141,8 +141,8 @@ const createCheckOutEvent = async (req: Request, res: Response) => {
       return res.status(409).json({ message: "User has not checked in" });
     }
 
-    if (req.body.endTime) {
-      existingEvent.endTime = req.body.endTime;
+    if (req.body.end) {
+      existingEvent.end = req.body.end;
     }
 
     await existingEvent.save();
