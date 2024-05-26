@@ -89,7 +89,7 @@ const createCheckInEvent = async (req: Request, res: Response) => {
     const EventModel = createBigReactCalendarEventModel(userIdParam);
 
     // 获取请求中的日期
-    const currentDay = new Date(req.body.startTime);
+    const currentDay = new Date(req.body.start);
     // 设置当天开始时间
     currentDay.setHours(0, 0, 0, 0);
     // // 设置当天结束时间
@@ -98,9 +98,9 @@ const createCheckInEvent = async (req: Request, res: Response) => {
 
     // 查询当天的“Actual Time”事件
     const existingEvent = await EventModel.findOne({
-      title: "Actual Time",
-      startTime: { $gte: currentDay.toString() },
-      endTime: { $exists: false },
+      title: "Working Time",
+      start: { $gte: currentDay.toString() },
+      end: { $exists: false },
     });
 
     if (existingEvent) {
@@ -123,7 +123,7 @@ const createCheckOutEvent = async (req: Request, res: Response) => {
     const EventModel = createBigReactCalendarEventModel(userIdParam);
 
     // 获取请求中的日期
-    const currentDay = new Date(req.body.endTime);
+    const currentDay = new Date(req.body.end);
     // 设置当天开始时间
     currentDay.setHours(0, 0, 0, 0);
     // // 设置当天结束时间
@@ -132,9 +132,9 @@ const createCheckOutEvent = async (req: Request, res: Response) => {
 
     // 查询当天的“Actual Time”事件
     const existingEvent = await EventModel.findOne({
-      title: "Actual Time",
-      startTime: { $gte: currentDay.toString() },
-      endTime: { $exists: false },
+      title: "Working Time",
+      start: { $gte: currentDay.toString() },
+      end: { $exists: false },
     });
 
     if (!existingEvent) {
