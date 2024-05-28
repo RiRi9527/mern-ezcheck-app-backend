@@ -4,7 +4,7 @@ import eventsController from "../controllers/eventsController";
 
 const router = express.Router();
 
-router.get("/:userIdParam", eventsController.getEvent);
+router.get("/:userIdParam/:start/:end", eventsController.getEvent);
 router.post("/:userIdParam", eventsController.createEvent);
 router.post("/:userIdParam/checkIn", eventsController.createCheckInEvent);
 

@@ -4,12 +4,18 @@ import createBigReactCalendarEventModel from "../models/bigReactCalendarEvent";
 const getEvent = async (req: Request, res: Response) => {
   try {
     // Extract userIdParam from request parameters
-    const userIdParam = req.params.userIdParam;
+    const { userIdParam, start: rangeStart, end: rangeEnd } = req.params;
+
+    // Adding a 3-second delay
+    // await new Promise((resolve) => setTimeout(resolve, 3000));
+
     // Create EventModel based on userIdParam
     const EventModel = createBigReactCalendarEventModel(userIdParam);
 
     // Retrieve all events that match the condition
-    const events = await EventModel.find();
+    const events = await EventModel.find({
+      start: { $gte: rangeStart, $lte: rangeEnd },
+    });
 
     // Send the event data back to the client
     res.status(200).json(events);
@@ -99,7 +105,7 @@ const createCheckInEvent = async (req: Request, res: Response) => {
     // 查询当天的“Actual Time”事件
     const existingEvent = await EventModel.findOne({
       title: "Working Time",
-      start: { $gte: currentDay.toString() },
+      start: { $gte: currentDay.toISOString() },
       end: { $exists: false },
     });
 
@@ -133,7 +139,7 @@ const createCheckOutEvent = async (req: Request, res: Response) => {
     // 查询当天的“Actual Time”事件
     const existingEvent = await EventModel.findOne({
       title: "Working Time",
-      start: { $gte: currentDay.toString() },
+      start: { $gte: currentDay.toISOString() },
       end: { $exists: false },
     });
 
