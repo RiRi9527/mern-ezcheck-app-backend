@@ -159,6 +159,56 @@ const createCheckOutEvent = async (req: Request, res: Response) => {
   }
 };
 
+const getTotalHrs = async (req: Request, res: Response) => {
+  try {
+    const { userIdParam, date } = req.params;
+
+    const startDate = new Date("2024-05-27"); // Define the start date of the pay period
+    const today = new Date();
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const dayDifference = Math.floor(
+      (today.getTime() - startDate.getTime()) / msPerDay
+    );
+    const periodNumber = Math.floor(dayDifference / 14);
+
+    const currentPeriodStart = new Date(startDate);
+    currentPeriodStart.setDate(startDate.getDate() + periodNumber * 14);
+
+    const currentPeriodEnd = new Date(currentPeriodStart);
+    currentPeriodEnd.setDate(currentPeriodStart.getDate() + 13); // 包含14天
+
+    // console.log(currentPeriodStart);
+    // console.log(currentPeriodEnd);
+
+    const EventModel = createBigReactCalendarEventModel(userIdParam);
+    const attendanceRecords = await EventModel.find({
+      $or: [
+        { start: { $gte: currentPeriodStart.toISOString() } },
+        { end: { $lte: currentPeriodEnd.toISOString() } },
+      ],
+    });
+
+    // console.log(attendanceRecords);
+
+    let totalWorkHours = 0;
+
+    attendanceRecords.forEach((record) => {
+      // // If there is a start and end time
+      if (record.title === "Working Time" && record.start && record.end) {
+        const start = new Date(record.start);
+        const end = new Date(record.end);
+        const workHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60); // 小时为单位
+        totalWorkHours += workHours;
+      }
+    });
+
+    res.status(200).json(totalWorkHours);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 export default {
   createEvent,
   editEvent,
@@ -166,17 +216,5 @@ export default {
   deleteEvent,
   createCheckInEvent,
   createCheckOutEvent,
+  getTotalHrs,
 };
-
-// const updatedAttendance = await Attendance.findOneAndUpdate(
-//   {
-//     startTime: { $gte: today },
-//     endTime: { $exists: false },
-//   },
-//   {
-//     endTime: new Date().toLocaleTimeString(),
-//   },
-//   {
-//     new: true, // 返回更新后的文档
-//   }
-// );
