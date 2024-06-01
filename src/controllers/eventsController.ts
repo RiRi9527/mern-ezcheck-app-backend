@@ -202,7 +202,10 @@ const getTotalHrs = async (req: Request, res: Response) => {
       }
     });
 
-    res.status(200).json(totalWorkHours);
+    const hours = Math.floor(totalWorkHours);
+    const minutes = Number(((totalWorkHours - hours) * 60).toFixed(0));
+
+    res.status(200).json({ hours, minutes });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
