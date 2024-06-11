@@ -36,7 +36,7 @@ const createEvent = async (req: Request, res: Response) => {
     }
     const event = new EventModel(req.body);
     await event.save();
-    return res.status(200).json(event._id);
+    return res.status(200).json(event);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: `Error Create Event` });
