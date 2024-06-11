@@ -182,7 +182,7 @@ const getTotalHrs = async (req: Request, res: Response) => {
 
     const EventModel = createBigReactCalendarEventModel(userIdParam);
     const attendanceRecords = await EventModel.find({
-      $or: [
+      $and: [
         { start: { $gte: currentPeriodStart.toISOString() } },
         { end: { $lte: currentPeriodEnd.toISOString() } },
       ],
