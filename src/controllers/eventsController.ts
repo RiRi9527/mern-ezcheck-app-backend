@@ -128,11 +128,11 @@ const createCheckOutEvent = async (req: Request, res: Response) => {
     const userIdParam = req.params.userIdParam;
     const EventModel = createBigReactCalendarEventModel(userIdParam);
 
-    // 获取请求中的日期
+    // Get the date in the request
     const currentDay = new Date(req.body.end);
-    // 设置当天开始时间
+    // Set the start time of the day
     currentDay.setHours(0, 0, 0, 0);
-    // // 设置当天结束时间
+    // // Set end of day time
     // const endTime = new Date(startTime);
     // endTime.setHours(23, 59, 59, 999);
 
