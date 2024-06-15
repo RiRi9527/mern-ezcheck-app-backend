@@ -10,6 +10,7 @@ export type UserType = {
   hourlyWage: number;
   working: boolean;
   imageUrl?: string;
+  status: "offline" | "online" | "busy";
   schedule?: {
     monday?: { checkIn: string; checkOut: string };
     tuesday?: { checkIn: string; checkOut: string };
@@ -51,6 +52,13 @@ const userSchema = new mongoose.Schema({
   position: { type: String, required: true },
   hourlyWage: { type: Number, required: true },
   working: { type: Boolean, default: false },
+  status: {
+    type: String,
+    enum: ["offline", "online", "busy"],
+    required: true,
+    default: "offline",
+  },
+
   imageUrl: { type: String },
   schedule: { type: scheduleSchema },
 });
