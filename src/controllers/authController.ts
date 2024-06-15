@@ -42,7 +42,7 @@ const authLogin = async (req: Request, res: Response) => {
 
 const authGetAllUsers = async (req: Request, res: Response) => {
   try {
-    const users = await User.find().select("firstName imageUrl");
+    const users = await User.find().select("firstName imageUrl status");
     res.status(200).json(users);
   } catch (error) {
     console.error("Error fetching users:", error);
