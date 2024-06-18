@@ -47,4 +47,11 @@ router.put(
   userController.editCurrentUserSchedule
 );
 
+router.put(
+  "/:userParamsId/status",
+  // verifyToken,
+  // verifyAuth,
+  userController.editCurrentUserStatus
+);
+
 export default router;

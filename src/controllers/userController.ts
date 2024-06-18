@@ -95,7 +95,35 @@ const editCurrentUserSchedule = async (req: Request, res: Response) => {
 
     await user.save();
 
-    return res.status(200).send(user);
+    return res.status(200).json(user);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: `Error changing user` });
+  }
+};
+
+const editCurrentUserStatus = async (req: Request, res: Response) => {
+  try {
+    const userIdParam = req.params.userParamsId;
+    const user = await User.findById(userIdParam);
+
+    if (!user) {
+      return res.status(409).json({ message: "User not found" });
+    }
+
+    if (user.status === "offline") {
+      return res.status(400).json({ message: "Please check in first" });
+    }
+
+    const { status } = req.body;
+    if (status) {
+      user.status = status;
+    } else {
+      return res.status(400).json({ message: "Status is required" });
+    }
+    await user.save();
+
+    return res.status(200).json(user.status);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: `Error changing user` });
@@ -116,4 +144,5 @@ export default {
   getCurrentUser,
   editCurrentUser,
   editCurrentUserSchedule,
+  editCurrentUserStatus,
 };

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import createBigReactCalendarEventModel from "../models/bigReactCalendarEvent";
+import User from "../models/user";
 
 const getEvent = async (req: Request, res: Response) => {
   try {
@@ -92,7 +93,15 @@ const deleteEvent = async (req: Request, res: Response) => {
 const createCheckInEvent = async (req: Request, res: Response) => {
   try {
     const userIdParam = req.params.userIdParam;
+    const user = await User.findById(userIdParam);
     const EventModel = createBigReactCalendarEventModel(userIdParam);
+
+    if (!user) {
+      return res.status(409).json({ message: "User not found" });
+    }
+
+    user.status = "online";
+    user.save();
 
     // 获取请求中的日期
     const currentDay = new Date(req.body.start);
@@ -126,7 +135,15 @@ const createCheckInEvent = async (req: Request, res: Response) => {
 const createCheckOutEvent = async (req: Request, res: Response) => {
   try {
     const userIdParam = req.params.userIdParam;
+    const user = await User.findById(userIdParam);
     const EventModel = createBigReactCalendarEventModel(userIdParam);
+
+    if (!user) {
+      return res.status(409).json({ message: "User not found" });
+    }
+
+    user.status = "offline";
+    user.save();
 
     // Get the date in the request
     const currentDay = new Date(req.body.end);
