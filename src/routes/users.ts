@@ -49,8 +49,7 @@ router.put(
 
 router.put(
   "/:userParamsId/status",
-  // verifyToken,
-  // verifyAuth,
+  verifyToken,
   userController.editCurrentUserStatus
 );
 

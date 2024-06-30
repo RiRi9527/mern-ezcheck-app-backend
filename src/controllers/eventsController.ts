@@ -194,8 +194,8 @@ const getTotalHrs = async (req: Request, res: Response) => {
     const currentPeriodEnd = new Date(currentPeriodStart);
     currentPeriodEnd.setDate(currentPeriodStart.getDate() + 13); // 包含14天
 
-    // console.log(currentPeriodStart);
-    // console.log(currentPeriodEnd);
+    const user = await User.findById(userIdParam);
+    console.log(user?.schedule);
 
     const EventModel = createBigReactCalendarEventModel(userIdParam);
     const attendanceRecords = await EventModel.find({
@@ -204,8 +204,6 @@ const getTotalHrs = async (req: Request, res: Response) => {
         { end: { $lte: currentPeriodEnd.toISOString() } },
       ],
     });
-
-    // console.log(attendanceRecords);
 
     let totalWorkHours = 0;
 
@@ -218,6 +216,8 @@ const getTotalHrs = async (req: Request, res: Response) => {
         totalWorkHours += workHours;
       }
     });
+
+    console.log(attendanceRecords);
 
     const hours = Math.floor(totalWorkHours);
     const minutes = Number(((totalWorkHours - hours) * 60).toFixed(0));
