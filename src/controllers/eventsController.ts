@@ -194,9 +194,6 @@ const getTotalHrs = async (req: Request, res: Response) => {
     const currentPeriodEnd = new Date(currentPeriodStart);
     currentPeriodEnd.setDate(currentPeriodStart.getDate() + 13); // 包含14天
 
-    const user = await User.findById(userIdParam);
-    console.log(user?.schedule);
-
     const EventModel = createBigReactCalendarEventModel(userIdParam);
     const attendanceRecords = await EventModel.find({
       $and: [
@@ -218,6 +215,106 @@ const getTotalHrs = async (req: Request, res: Response) => {
     });
 
     console.log(attendanceRecords);
+
+    const hours = Math.floor(totalWorkHours);
+    const minutes = Number(((totalWorkHours - hours) * 60).toFixed(0));
+    const payRoll = attendanceRecords;
+
+    res.status(200).json({ hours, minutes, payRoll });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const convertedTimes = async (req: Request, res: Response) => {
+  try {
+    const { userIdParam, date } = req.params;
+
+    const startDate = new Date("2024-05-27"); // Define the start date of the pay period
+    const today = new Date();
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const dayDifference = Math.floor(
+      (today.getTime() - startDate.getTime()) / msPerDay
+    );
+    const periodNumber = Math.floor(dayDifference / 14);
+
+    const currentPeriodStart = new Date(startDate);
+    currentPeriodStart.setDate(startDate.getDate() + periodNumber * 14);
+
+    const currentPeriodEnd = new Date(currentPeriodStart);
+    currentPeriodEnd.setDate(currentPeriodStart.getDate() + 13); // 包含14天
+
+    const user = await User.findById(userIdParam);
+    const weeklySchedule = user?.schedule;
+
+    const EventModel = createBigReactCalendarEventModel(userIdParam);
+    const attendanceRecords = await EventModel.find({
+      $and: [
+        { start: { $gte: currentPeriodStart.toISOString() } },
+        { end: { $lte: currentPeriodEnd.toISOString() } },
+      ],
+    });
+
+    let totalWorkHours = 0;
+
+    attendanceRecords.forEach((record) => {
+      // // If there is a start and end time
+      if (record.title === "Working Time" && record.start && record.end) {
+        const start = new Date(record.start);
+        const end = new Date(record.end);
+        const workHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60); // 小时为单位
+        totalWorkHours += workHours;
+      }
+    });
+
+    const convertedTimes = attendanceRecords.map((time) => {
+      const startDate = new Date(time.start);
+      const endDate = new Date(time.end);
+      const dayOfWeek = startDate
+        .toLocaleString("en-US", { weekday: "long" })
+        .toLowerCase(); // 获取完整的星期几名称
+
+      // const schedule = workSchedule[dayOfWeek];
+
+      const schedule = weeklySchedule
+        ? weeklySchedule[dayOfWeek as keyof typeof weeklySchedule]
+        : undefined;
+
+      if (!schedule) {
+        return;
+      }
+
+      const scheduleCheckIn = new Date(time.start); // Assuming time.start is defined
+      const scheduleCheckOut = new Date(time.end);
+
+      if (schedule?.checkIn && schedule?.checkOut) {
+        const [checkInHr, checkInMin] = schedule.checkIn.split(":").map(Number);
+        const [checkOutHr, checkOutMin] = schedule.checkOut
+          .split(":")
+          .map(Number);
+
+        // Set hours and minutes to the Date object
+        scheduleCheckIn.setHours(checkInHr);
+        scheduleCheckIn.setMinutes(checkInMin);
+
+        scheduleCheckOut.setHours(checkOutHr);
+        scheduleCheckOut.setMinutes(checkOutMin);
+      }
+
+      const finalCheckIn =
+        startDate > scheduleCheckIn ? startDate : scheduleCheckIn;
+      const finalCheckOut =
+        endDate < scheduleCheckOut ? endDate : scheduleCheckOut;
+
+      return {
+        title: "Working Time",
+        start: finalCheckIn.toLocaleString(),
+        end: finalCheckOut.toLocaleString(),
+      };
+    });
+
+    console.log(convertedTimes);
 
     const hours = Math.floor(totalWorkHours);
     const minutes = Number(((totalWorkHours - hours) * 60).toFixed(0));
