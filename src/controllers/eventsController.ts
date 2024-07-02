@@ -227,7 +227,7 @@ const getTotalHrs = async (req: Request, res: Response) => {
   }
 };
 
-const convertedTimes = async (req: Request, res: Response) => {
+const getTotalHrsI = async (req: Request, res: Response) => {
   try {
     const { userIdParam, date } = req.params;
 
@@ -254,18 +254,6 @@ const convertedTimes = async (req: Request, res: Response) => {
         { start: { $gte: currentPeriodStart.toISOString() } },
         { end: { $lte: currentPeriodEnd.toISOString() } },
       ],
-    });
-
-    let totalWorkHours = 0;
-
-    attendanceRecords.forEach((record) => {
-      // // If there is a start and end time
-      if (record.title === "Working Time" && record.start && record.end) {
-        const start = new Date(record.start);
-        const end = new Date(record.end);
-        const workHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60); // 小时为单位
-        totalWorkHours += workHours;
-      }
     });
 
     const convertedTimes = attendanceRecords.map((time) => {
@@ -314,12 +302,24 @@ const convertedTimes = async (req: Request, res: Response) => {
       };
     });
 
-    console.log(convertedTimes);
+    let totalWorkHours = 0;
+
+    convertedTimes.forEach((record) => {
+      // // If there is a start and end time
+      if (record?.title === "Working Time" && record.start && record.end) {
+        const start = new Date(record.start);
+        const end = new Date(record.end);
+        const workHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60); // 小时为单位
+        totalWorkHours += workHours;
+      }
+    });
 
     const hours = Math.floor(totalWorkHours);
     const minutes = Number(((totalWorkHours - hours) * 60).toFixed(0));
 
-    res.status(200).json({ hours, minutes });
+    const payRoll = convertedTimes;
+
+    res.status(200).json({ hours, minutes, payRoll });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
