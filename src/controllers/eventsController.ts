@@ -178,10 +178,10 @@ const createCheckOutEvent = async (req: Request, res: Response) => {
 
 const getTotalHrs = async (req: Request, res: Response) => {
   try {
-    const { userIdParam, date } = req.params;
+    const { userIdParam, date, payRollRequest } = req.params;
 
     const startDate = new Date("2024-05-27"); // Define the start date of the pay period
-    const today = new Date();
+    const today = new Date(date);
     const msPerDay = 1000 * 60 * 60 * 24;
     const dayDifference = Math.floor(
       (today.getTime() - startDate.getTime()) / msPerDay
@@ -220,7 +220,11 @@ const getTotalHrs = async (req: Request, res: Response) => {
     const minutes = Number(((totalWorkHours - hours) * 60).toFixed(0));
     const payRoll = attendanceRecords;
 
-    res.status(200).json({ hours, minutes, payRoll });
+    if (payRollRequest) {
+      res.status(200).json({ hours, minutes, payRoll });
+    } else {
+      res.status(200).json({ hours, minutes });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -229,10 +233,10 @@ const getTotalHrs = async (req: Request, res: Response) => {
 
 const getTotalHrsI = async (req: Request, res: Response) => {
   try {
-    const { userIdParam, date } = req.params;
+    const { userIdParam, date, payRollRequest } = req.params;
 
     const startDate = new Date("2024-05-27"); // Define the start date of the pay period
-    const today = new Date();
+    const today = new Date(date);
     const msPerDay = 1000 * 60 * 60 * 24;
     const dayDifference = Math.floor(
       (today.getTime() - startDate.getTime()) / msPerDay
@@ -319,7 +323,11 @@ const getTotalHrsI = async (req: Request, res: Response) => {
 
     const payRoll = convertedTimes;
 
-    res.status(200).json({ hours, minutes, payRoll });
+    if (payRollRequest) {
+      res.status(200).json({ hours, minutes, payRoll });
+    } else {
+      res.status(200).json({ hours, minutes });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
