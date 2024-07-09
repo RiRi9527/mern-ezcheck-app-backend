@@ -4,8 +4,8 @@ import eventsController from "../controllers/eventsController";
 
 const router = express.Router();
 
-router.get("/:userIdParam/:start/:end", eventsController.getEvent);
-router.get("/:userIdParam/hrs", eventsController.getTotalHrs);
+router.get("/get/:userIdParam/:start/:end", eventsController.getEvent);
+router.get("/hrs/:userIdParam/:dateString", eventsController.getTotalHrs);
 
 router.post("/:userIdParam", eventsController.createEvent);
 router.post("/:userIdParam/checkIn", eventsController.createCheckInEvent);

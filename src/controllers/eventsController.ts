@@ -178,10 +178,12 @@ const createCheckOutEvent = async (req: Request, res: Response) => {
 
 const getTotalHrs = async (req: Request, res: Response) => {
   try {
-    const { userIdParam, date, payRollRequest } = req.params;
+    const { userIdParam, dateString, payRollRequest } = req.params;
+    console.log(userIdParam);
+    console.log(dateString);
 
     const startDate = new Date("2024-05-27"); // Define the start date of the pay period
-    const today = new Date(date);
+    const today = new Date();
     const msPerDay = 1000 * 60 * 60 * 24;
     const dayDifference = Math.floor(
       (today.getTime() - startDate.getTime()) / msPerDay
@@ -214,7 +216,7 @@ const getTotalHrs = async (req: Request, res: Response) => {
       }
     });
 
-    console.log(attendanceRecords);
+    // console.log(attendanceRecords);
 
     const hours = Math.floor(totalWorkHours);
     const minutes = Number(((totalWorkHours - hours) * 60).toFixed(0));
