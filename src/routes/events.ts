@@ -5,7 +5,10 @@ import eventsController from "../controllers/eventsController";
 const router = express.Router();
 
 router.get("/get/:userIdParam/:start/:end", eventsController.getEvent);
-router.get("/hrs/:userIdParam/:dateString", eventsController.getTotalHrs);
+router.get(
+  "/hrs/:userIdParam/:payrollDateNumber",
+  eventsController.getTotalHrs
+);
 
 router.post("/:userIdParam", eventsController.createEvent);
 router.post("/:userIdParam/checkIn", eventsController.createCheckInEvent);
