@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get("/get/:userIdParam/:start/:end", eventsController.getEvent);
 router.get(
-  "/hrs/:userIdParam/:payrollDateNumber",
+  "/hrs/:userIdParam/:payrollDateString",
   eventsController.getTotalHrs
 );
 
