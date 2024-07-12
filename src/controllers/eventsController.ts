@@ -176,9 +176,9 @@ const createCheckOutEvent = async (req: Request, res: Response) => {
   }
 };
 
-const getTotalHrs = async (req: Request, res: Response) => {
+const getPayroll = async (req: Request, res: Response) => {
   try {
-    const { userIdParam, payrollDateString, payRollRequest } = req.params;
+    const { userIdParam, payrollDateString, payrollString } = req.params;
 
     const startDate = new Date("2024-05-27"); // Define the start date of the pay period
 
@@ -222,7 +222,7 @@ const getTotalHrs = async (req: Request, res: Response) => {
     const minutes = Number(((totalWorkHours - hours) * 60).toFixed(0));
     const payRoll = attendanceRecords;
 
-    if (payRollRequest) {
+    if (payrollString === "payroll") {
       res.status(200).json({ hours, minutes, payRoll });
     } else {
       res.status(200).json({ hours, minutes });
@@ -345,5 +345,5 @@ export default {
   deleteEvent,
   createCheckInEvent,
   createCheckOutEvent,
-  getTotalHrs,
+  getPayroll,
 };
