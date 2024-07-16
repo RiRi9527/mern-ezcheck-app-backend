@@ -221,9 +221,17 @@ const getPayroll = async (req: Request, res: Response) => {
     const hours = Math.floor(totalWorkHours);
     const minutes = Number(((totalWorkHours - hours) * 60).toFixed(0));
     const payRoll = attendanceRecords;
+    const weekStartDateString = currentPeriodStart.toISOString();
+    const weekEndDateString = currentPeriodEnd.toISOString();
 
     if (payrollString === "payroll") {
-      res.status(200).json({ hours, minutes, payRoll });
+      res.status(200).json({
+        hours,
+        minutes,
+        payRoll,
+        weekStartDateString,
+        weekEndDateString,
+      });
     } else {
       res.status(200).json({ hours, minutes });
     }
