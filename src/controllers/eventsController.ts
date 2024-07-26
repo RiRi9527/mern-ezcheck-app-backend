@@ -204,6 +204,9 @@ const getPayroll = async (req: Request, res: Response) => {
       ],
     });
 
+    attendanceRecords.sort((a, b) => {
+      return new Date(a.start).getTime() - new Date(b.start).getTime();
+    });
     let totalWorkHours = 0;
 
     attendanceRecords.forEach((record) => {
