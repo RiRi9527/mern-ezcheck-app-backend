@@ -103,15 +103,17 @@ const createCheckInEvent = async (req: Request, res: Response) => {
     user.status = "online";
     user.save();
 
-    // 获取请求中的日期
+    // Get the date from the request body
+
     const currentDay = new Date(req.body.start);
-    // 设置当天开始时间
+    // Set the start time of the day
+
     currentDay.setHours(0, 0, 0, 0);
-    // // 设置当天结束时间
+    // Set the end time of the day (commented out in the original code)
     // const endTime = new Date(startTime);
     // endTime.setHours(23, 59, 59, 999);
 
-    // 查询当天的“Actual Time”事件
+    // Query the "Actual Time" events for the day
     const existingEvent = await EventModel.findOne({
       title: "Working Time",
       start: { $gte: currentDay.toISOString() },
@@ -153,7 +155,8 @@ const createCheckOutEvent = async (req: Request, res: Response) => {
     // const endTime = new Date(startTime);
     // endTime.setHours(23, 59, 59, 999);
 
-    // 查询当天的“Actual Time”事件
+    // Query the "Actual Time" events for the day
+
     const existingEvent = await EventModel.findOne({
       title: "Working Time",
       start: { $gte: currentDay.toISOString() },
@@ -214,7 +217,8 @@ const getPayroll = async (req: Request, res: Response) => {
       if (record.title === "Working Time" && record.start && record.end) {
         const start = new Date(record.start);
         const end = new Date(record.end);
-        const workHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60); // 小时为单位
+        const workHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60); // In units of hours
+
         totalWorkHours += workHours;
       }
     });
@@ -262,7 +266,7 @@ const getTotalHrsI = async (req: Request, res: Response) => {
     currentPeriodStart.setDate(startDate.getDate() + periodNumber * 14);
 
     const currentPeriodEnd = new Date(currentPeriodStart);
-    currentPeriodEnd.setDate(currentPeriodStart.getDate() + 13); // 包含14天
+    currentPeriodEnd.setDate(currentPeriodStart.getDate() + 13); // Includes 14 days
 
     const user = await User.findById(userIdParam);
     const weeklySchedule = user?.schedule;
@@ -280,7 +284,7 @@ const getTotalHrsI = async (req: Request, res: Response) => {
       const endDate = new Date(time.end);
       const dayOfWeek = startDate
         .toLocaleString("en-US", { weekday: "long" })
-        .toLowerCase(); // 获取完整的星期几名称
+        .toLowerCase(); // Get the full name of the day of the week
 
       // const schedule = workSchedule[dayOfWeek];
 
