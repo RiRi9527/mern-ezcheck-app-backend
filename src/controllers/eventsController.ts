@@ -332,7 +332,7 @@ const getTotalHrsI = async (req: Request, res: Response) => {
       if (record?.title === "Working Time" && record.start && record.end) {
         const start = new Date(record.start);
         const end = new Date(record.end);
-        const workHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60); // 小时为单位
+        const workHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60); // in units of hours
         totalWorkHours += workHours;
       }
     });
