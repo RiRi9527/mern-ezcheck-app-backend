@@ -4,14 +4,14 @@ import User from "../models/user";
 
 const getEvent = async (req: Request, res: Response) => {
   try {
-    // Extract userIdParam from request parameters
-    const { userIdParam, start: rangeStart, end: rangeEnd } = req.params;
+    // Extract userParamsId from request parameters
+    const { userParamsId, start: rangeStart, end: rangeEnd } = req.params;
 
     // Adding a 3-second delay
     // await new Promise((resolve) => setTimeout(resolve, 3000));
 
-    // Create EventModel based on userIdParam
-    const EventModel = createBigReactCalendarEventModel(userIdParam);
+    // Create EventModel based on userParamsId
+    const EventModel = createBigReactCalendarEventModel(userParamsId);
 
     // Retrieve all events that match the condition
     const events = await EventModel.find({
@@ -29,8 +29,8 @@ const getEvent = async (req: Request, res: Response) => {
 
 const createEvent = async (req: Request, res: Response) => {
   try {
-    const userIdParam = req.params.userIdParam;
-    const EventModel = createBigReactCalendarEventModel(userIdParam);
+    const userParamsId = req.params.userParamsId;
+    const EventModel = createBigReactCalendarEventModel(userParamsId);
     const existingEvent = await EventModel.findById(req.body._id);
     if (existingEvent) {
       return res.status(409).json({ message: "Event already exists" });
@@ -46,8 +46,8 @@ const createEvent = async (req: Request, res: Response) => {
 
 const editEvent = async (req: Request, res: Response) => {
   try {
-    const userIdParam = req.params.userIdParam;
-    const EventModel = createBigReactCalendarEventModel(userIdParam);
+    const userParamsId = req.params.userParamsId;
+    const EventModel = createBigReactCalendarEventModel(userParamsId);
     const existingEvent = await EventModel.findById(req.body._id);
 
     if (!existingEvent) {
@@ -74,9 +74,9 @@ const editEvent = async (req: Request, res: Response) => {
 
 const deleteEvent = async (req: Request, res: Response) => {
   try {
-    const userIdParam = req.params.userIdParam;
+    const userParamsId = req.params.userParamsId;
 
-    const EventModel = createBigReactCalendarEventModel(userIdParam);
+    const EventModel = createBigReactCalendarEventModel(userParamsId);
     const deletedEvent = await EventModel.findByIdAndDelete(req.body.eventId);
 
     if (!deletedEvent) {
@@ -92,9 +92,9 @@ const deleteEvent = async (req: Request, res: Response) => {
 
 const createCheckInEvent = async (req: Request, res: Response) => {
   try {
-    const userIdParam = req.params.userIdParam;
-    const user = await User.findById(userIdParam);
-    const EventModel = createBigReactCalendarEventModel(userIdParam);
+    const userParamsId = req.params.userParamsId;
+    const user = await User.findById(userParamsId);
+    const EventModel = createBigReactCalendarEventModel(userParamsId);
 
     if (!user) {
       return res.status(409).json({ message: "User not found" });
@@ -136,9 +136,9 @@ const createCheckInEvent = async (req: Request, res: Response) => {
 
 const createCheckOutEvent = async (req: Request, res: Response) => {
   try {
-    const userIdParam = req.params.userIdParam;
-    const user = await User.findById(userIdParam);
-    const EventModel = createBigReactCalendarEventModel(userIdParam);
+    const userParamsId = req.params.userParamsId;
+    const user = await User.findById(userParamsId);
+    const EventModel = createBigReactCalendarEventModel(userParamsId);
 
     if (!user) {
       return res.status(409).json({ message: "User not found" });
@@ -181,7 +181,7 @@ const createCheckOutEvent = async (req: Request, res: Response) => {
 
 const getPayroll = async (req: Request, res: Response) => {
   try {
-    const { userIdParam, payrollDateString, payrollString } = req.params;
+    const { userParamsId, payrollDateString, payrollString } = req.params;
 
     const startDate = new Date("2024-05-27"); // Define the start date of the pay period
 
@@ -199,7 +199,7 @@ const getPayroll = async (req: Request, res: Response) => {
     const currentPeriodEnd = new Date(currentPeriodStart);
     currentPeriodEnd.setDate(currentPeriodStart.getDate() + 13); // 包含14天
 
-    const EventModel = createBigReactCalendarEventModel(userIdParam);
+    const EventModel = createBigReactCalendarEventModel(userParamsId);
     const attendanceRecords = await EventModel.find({
       $and: [
         { start: { $gte: currentPeriodStart.toISOString() } },
@@ -250,9 +250,9 @@ const getPayroll = async (req: Request, res: Response) => {
 
 const getTotalHrsI = async (req: Request, res: Response) => {
   try {
-    const { userIdParam, payrollDate, payRollRequest } = req.params;
+    const { userParamsId, payrollDate, payRollRequest } = req.params;
 
-    console.log(payrollDate);
+    // console.log(payrollDate);
 
     const startDate = new Date("2024-05-27"); // Define the start date of the pay period
     const today = new Date();
@@ -268,10 +268,10 @@ const getTotalHrsI = async (req: Request, res: Response) => {
     const currentPeriodEnd = new Date(currentPeriodStart);
     currentPeriodEnd.setDate(currentPeriodStart.getDate() + 13); // Includes 14 days
 
-    const user = await User.findById(userIdParam);
+    const user = await User.findById(userParamsId);
     const weeklySchedule = user?.schedule;
 
-    const EventModel = createBigReactCalendarEventModel(userIdParam);
+    const EventModel = createBigReactCalendarEventModel(userParamsId);
     const attendanceRecords = await EventModel.find({
       $and: [
         { start: { $gte: currentPeriodStart.toISOString() } },
