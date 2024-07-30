@@ -4,6 +4,8 @@ import userController from "../controllers/userController";
 import { validateMyUserRequest } from "../middleware/validation";
 import verifyToken from "../middleware/verifyToken";
 import verifyAuth from "../middleware/verifyAuth";
+import verifyAuthIII from "../middleware/verifyAuthIII";
+import verifyAuthII from "../middleware/verifyAuthII";
 
 const router = express.Router();
 
@@ -25,7 +27,7 @@ router.get(
 router.post(
   "/register",
   verifyToken,
-  verifyAuth,
+  verifyAuthIII,
   upload.single("imageFile"),
   validateMyUserRequest,
   userController.createCurrentUser
@@ -34,7 +36,7 @@ router.post(
 router.put(
   "/:userParamsId",
   verifyToken,
-  verifyAuth,
+  verifyAuthIII,
   upload.single("imageFile"),
   validateMyUserRequest,
   userController.editCurrentUser
@@ -43,13 +45,14 @@ router.put(
 router.put(
   "/:userParamsId/schedule",
   verifyToken,
-  verifyAuth,
+  verifyAuthII,
   userController.editCurrentUserSchedule
 );
 
 router.put(
   "/:userParamsId/status",
   verifyToken,
+  verifyAuth,
   userController.editCurrentUserStatus
 );
 

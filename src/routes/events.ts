@@ -2,6 +2,8 @@ import express, { Response, Request } from "express";
 import verifyToken from "../middleware/verifyToken";
 import eventsController from "../controllers/eventsController";
 import verifyAuth from "../middleware/verifyAuth";
+import verifyAuthIII from "../middleware/verifyAuthIII";
+import verifyAuthII from "../middleware/verifyAuthII";
 
 const router = express.Router();
 
@@ -14,14 +16,14 @@ router.get(
 router.get(
   "/pay/:userParamsId/:payrollDateString/:payrollString",
   verifyToken,
-  verifyAuth,
+  verifyAuthIII,
   eventsController.getPayroll
 );
 
 router.post(
   "/:userParamsId",
   verifyToken,
-  verifyAuth,
+  verifyAuthII,
   eventsController.createEvent
 );
 router.post(
@@ -34,7 +36,7 @@ router.post(
 router.put(
   "/:userParamsId",
   verifyToken,
-  verifyAuth,
+  verifyAuthII,
   eventsController.editEvent
 );
 router.put(
@@ -47,7 +49,7 @@ router.put(
 router.delete(
   "/:userParamsId",
   verifyToken,
-  verifyAuth,
+  verifyAuthII,
   eventsController.deleteEvent
 );
 
