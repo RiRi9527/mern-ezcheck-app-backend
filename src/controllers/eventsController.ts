@@ -187,6 +187,10 @@ const getPayroll = async (req: Request, res: Response) => {
 
     const payrollDate = new Date(payrollDateString);
 
+    if (isNaN(payrollDate.getTime())) {
+      return res.status(400).json({ error: "Invalid payrollDateString value" });
+    }
+
     const msPerDay = 1000 * 60 * 60 * 24;
     const dayDifference = Math.floor(
       (payrollDate.getTime() - startDate.getTime()) / msPerDay
