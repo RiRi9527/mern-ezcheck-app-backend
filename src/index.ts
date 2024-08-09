@@ -35,6 +35,6 @@ app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventsRoutes);
 
-app.listen(7000, () => {
+app.listen(7000, "0.0.0.0", () => {
   console.log("server running on the localhost: 7000");
 });
