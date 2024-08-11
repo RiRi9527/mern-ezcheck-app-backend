@@ -203,6 +203,9 @@ const getPayroll = async (req: Request, res: Response) => {
     const currentPeriodEnd = new Date(currentPeriodStart);
     currentPeriodEnd.setDate(currentPeriodStart.getDate() + 13); // 包含14天
 
+    const user = await User.findById(userParamsId);
+    const weeklySchedule = user?.schedule;
+
     const EventModel = createBigReactCalendarEventModel(userParamsId);
     const attendanceRecords = await EventModel.find({
       $and: [
@@ -214,6 +217,88 @@ const getPayroll = async (req: Request, res: Response) => {
     attendanceRecords.sort((a, b) => {
       return new Date(a.start).getTime() - new Date(b.start).getTime();
     });
+
+    if (user?.position === "Customer Service I") {
+      const convertedTimes = attendanceRecords.map((time) => {
+        const startDate = new Date(time.start);
+        const endDate = new Date(time.end);
+        const dayOfWeek = startDate
+          .toLocaleString("en-US", { weekday: "long" })
+          .toLowerCase(); // Get the full name of the day of the week
+
+        // const schedule = workSchedule[dayOfWeek];
+
+        const schedule = weeklySchedule
+          ? weeklySchedule[dayOfWeek as keyof typeof weeklySchedule]
+          : undefined;
+
+        if (!schedule) {
+          return;
+        }
+
+        const scheduleCheckIn = new Date(time.start); // Assuming time.start is defined
+        const scheduleCheckOut = new Date(time.end);
+
+        if (schedule?.checkIn && schedule?.checkOut) {
+          const [checkInHr, checkInMin] = schedule.checkIn
+            .split(":")
+            .map(Number);
+          const [checkOutHr, checkOutMin] = schedule.checkOut
+            .split(":")
+            .map(Number);
+
+          // Set hours and minutes to the Date object
+          scheduleCheckIn.setHours(checkInHr);
+          scheduleCheckIn.setMinutes(checkInMin);
+
+          scheduleCheckOut.setHours(checkOutHr);
+          scheduleCheckOut.setMinutes(checkOutMin);
+        }
+
+        const finalCheckIn =
+          startDate > scheduleCheckIn ? startDate : scheduleCheckIn;
+        const finalCheckOut =
+          endDate < scheduleCheckOut ? endDate : scheduleCheckOut;
+
+        return {
+          title: "Working Time",
+          start: finalCheckIn.toLocaleString(),
+          end: finalCheckOut.toLocaleString(),
+        };
+      });
+
+      let totalWorkHours = 0;
+
+      convertedTimes.forEach((record) => {
+        // // If there is a start and end time
+        if (record?.title === "Working Time" && record.start && record.end) {
+          const start = new Date(record.start);
+          const end = new Date(record.end);
+          const workHours =
+            (end.getTime() - start.getTime()) / (1000 * 60 * 60); // in units of hours
+          totalWorkHours += workHours;
+        }
+      });
+
+      const hours = Math.floor(totalWorkHours);
+      const minutes = Number(((totalWorkHours - hours) * 60).toFixed(0));
+      const payRoll = convertedTimes;
+      const weekStartDateString = currentPeriodStart.toISOString();
+      const weekEndDateString = currentPeriodEnd.toISOString();
+
+      if (payrollString === "payroll") {
+        return res.status(200).json({
+          hours,
+          minutes,
+          payRoll,
+          weekStartDateString,
+          weekEndDateString,
+        });
+      } else {
+        return res.status(200).json({ hours, minutes });
+      }
+    }
+
     let totalWorkHours = 0;
 
     attendanceRecords.forEach((record) => {
@@ -252,110 +337,110 @@ const getPayroll = async (req: Request, res: Response) => {
   }
 };
 
-const getTotalHrsI = async (req: Request, res: Response) => {
-  try {
-    const { userParamsId, payrollDate, payRollRequest } = req.params;
+// const getTotalHrsI = async (req: Request, res: Response) => {
+//   try {
+//     const { userParamsId, payrollDate, payRollRequest } = req.params;
 
-    // console.log(payrollDate);
+//     // console.log(payrollDate);
 
-    const startDate = new Date("2024-05-27"); // Define the start date of the pay period
-    const today = new Date();
-    const msPerDay = 1000 * 60 * 60 * 24;
-    const dayDifference = Math.floor(
-      (today.getTime() - startDate.getTime()) / msPerDay
-    );
-    const periodNumber = Math.floor(dayDifference / 14);
+//     const startDate = new Date("2024-05-27"); // Define the start date of the pay period
+//     const today = new Date();
+//     const msPerDay = 1000 * 60 * 60 * 24;
+//     const dayDifference = Math.floor(
+//       (today.getTime() - startDate.getTime()) / msPerDay
+//     );
+//     const periodNumber = Math.floor(dayDifference / 14);
 
-    const currentPeriodStart = new Date(startDate);
-    currentPeriodStart.setDate(startDate.getDate() + periodNumber * 14);
+//     const currentPeriodStart = new Date(startDate);
+//     currentPeriodStart.setDate(startDate.getDate() + periodNumber * 14);
 
-    const currentPeriodEnd = new Date(currentPeriodStart);
-    currentPeriodEnd.setDate(currentPeriodStart.getDate() + 13); // Includes 14 days
+//     const currentPeriodEnd = new Date(currentPeriodStart);
+//     currentPeriodEnd.setDate(currentPeriodStart.getDate() + 13); // Includes 14 days
 
-    const user = await User.findById(userParamsId);
-    const weeklySchedule = user?.schedule;
+//     const user = await User.findById(userParamsId);
+//     const weeklySchedule = user?.schedule;
 
-    const EventModel = createBigReactCalendarEventModel(userParamsId);
-    const attendanceRecords = await EventModel.find({
-      $and: [
-        { start: { $gte: currentPeriodStart.toISOString() } },
-        { end: { $lte: currentPeriodEnd.toISOString() } },
-      ],
-    });
+//     const EventModel = createBigReactCalendarEventModel(userParamsId);
+//     const attendanceRecords = await EventModel.find({
+//       $and: [
+//         { start: { $gte: currentPeriodStart.toISOString() } },
+//         { end: { $lte: currentPeriodEnd.toISOString() } },
+//       ],
+//     });
 
-    const convertedTimes = attendanceRecords.map((time) => {
-      const startDate = new Date(time.start);
-      const endDate = new Date(time.end);
-      const dayOfWeek = startDate
-        .toLocaleString("en-US", { weekday: "long" })
-        .toLowerCase(); // Get the full name of the day of the week
+//     const convertedTimes = attendanceRecords.map((time) => {
+//       const startDate = new Date(time.start);
+//       const endDate = new Date(time.end);
+//       const dayOfWeek = startDate
+//         .toLocaleString("en-US", { weekday: "long" })
+//         .toLowerCase(); // Get the full name of the day of the week
 
-      // const schedule = workSchedule[dayOfWeek];
+//       // const schedule = workSchedule[dayOfWeek];
 
-      const schedule = weeklySchedule
-        ? weeklySchedule[dayOfWeek as keyof typeof weeklySchedule]
-        : undefined;
+//       const schedule = weeklySchedule
+//         ? weeklySchedule[dayOfWeek as keyof typeof weeklySchedule]
+//         : undefined;
 
-      if (!schedule) {
-        return;
-      }
+//       if (!schedule) {
+//         return;
+//       }
 
-      const scheduleCheckIn = new Date(time.start); // Assuming time.start is defined
-      const scheduleCheckOut = new Date(time.end);
+//       const scheduleCheckIn = new Date(time.start); // Assuming time.start is defined
+//       const scheduleCheckOut = new Date(time.end);
 
-      if (schedule?.checkIn && schedule?.checkOut) {
-        const [checkInHr, checkInMin] = schedule.checkIn.split(":").map(Number);
-        const [checkOutHr, checkOutMin] = schedule.checkOut
-          .split(":")
-          .map(Number);
+//       if (schedule?.checkIn && schedule?.checkOut) {
+//         const [checkInHr, checkInMin] = schedule.checkIn.split(":").map(Number);
+//         const [checkOutHr, checkOutMin] = schedule.checkOut
+//           .split(":")
+//           .map(Number);
 
-        // Set hours and minutes to the Date object
-        scheduleCheckIn.setHours(checkInHr);
-        scheduleCheckIn.setMinutes(checkInMin);
+//         // Set hours and minutes to the Date object
+//         scheduleCheckIn.setHours(checkInHr);
+//         scheduleCheckIn.setMinutes(checkInMin);
 
-        scheduleCheckOut.setHours(checkOutHr);
-        scheduleCheckOut.setMinutes(checkOutMin);
-      }
+//         scheduleCheckOut.setHours(checkOutHr);
+//         scheduleCheckOut.setMinutes(checkOutMin);
+//       }
 
-      const finalCheckIn =
-        startDate > scheduleCheckIn ? startDate : scheduleCheckIn;
-      const finalCheckOut =
-        endDate < scheduleCheckOut ? endDate : scheduleCheckOut;
+//       const finalCheckIn =
+//         startDate > scheduleCheckIn ? startDate : scheduleCheckIn;
+//       const finalCheckOut =
+//         endDate < scheduleCheckOut ? endDate : scheduleCheckOut;
 
-      return {
-        title: "Working Time",
-        start: finalCheckIn.toLocaleString(),
-        end: finalCheckOut.toLocaleString(),
-      };
-    });
+//       return {
+//         title: "Working Time",
+//         start: finalCheckIn.toLocaleString(),
+//         end: finalCheckOut.toLocaleString(),
+//       };
+//     });
 
-    let totalWorkHours = 0;
+//     let totalWorkHours = 0;
 
-    convertedTimes.forEach((record) => {
-      // // If there is a start and end time
-      if (record?.title === "Working Time" && record.start && record.end) {
-        const start = new Date(record.start);
-        const end = new Date(record.end);
-        const workHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60); // in units of hours
-        totalWorkHours += workHours;
-      }
-    });
+//     convertedTimes.forEach((record) => {
+//       // // If there is a start and end time
+//       if (record?.title === "Working Time" && record.start && record.end) {
+//         const start = new Date(record.start);
+//         const end = new Date(record.end);
+//         const workHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60); // in units of hours
+//         totalWorkHours += workHours;
+//       }
+//     });
 
-    const hours = Math.floor(totalWorkHours);
-    const minutes = Number(((totalWorkHours - hours) * 60).toFixed(0));
+//     const hours = Math.floor(totalWorkHours);
+//     const minutes = Number(((totalWorkHours - hours) * 60).toFixed(0));
 
-    const payRoll = convertedTimes;
+//     const payRoll = convertedTimes;
 
-    if (payRollRequest) {
-      res.status(200).json({ hours, minutes, payRoll });
-    } else {
-      res.status(200).json({ hours, minutes });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
+//     if (payRollRequest) {
+//       res.status(200).json({ hours, minutes, payRoll });
+//     } else {
+//       res.status(200).json({ hours, minutes });
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
 
 export default {
   createEvent,

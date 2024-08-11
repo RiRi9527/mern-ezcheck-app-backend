@@ -47,7 +47,7 @@ export const createBigReactCalendarEventModel = (
   }
 
   const attendanceSchema = new mongoose.Schema({
-    title: { type: String, require: true },
+    title: { type: String, require: true, index: true },
     start: { type: String },
     end: { type: String },
   });

@@ -16,7 +16,7 @@ router.get(
 router.get(
   "/pay/:userParamsId/:payrollDateString/:payrollString",
   verifyToken,
-  verifyAuthIII,
+  verifyAuth,
   eventsController.getPayroll
 );
 
