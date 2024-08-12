@@ -12,7 +12,7 @@ const getCurrentUser = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (auth?.position === "CEO") {
+    if (auth?.position === "CEO" || userIdParam === auth?._id.toString()) {
       return res.json(user);
     }
 
