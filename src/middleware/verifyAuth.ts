@@ -7,14 +7,14 @@ const verifyAuth = async (req: Request, res: Response, next: NextFunction) => {
     const userIdParam = req.params.userParamsId;
 
     if (
-      userIdParam !== req.userId &&
-      auth?.position !== "CEO" &&
-      auth?.position !== "Office Manager"
+      userIdParam === req.userId ||
+      auth?.position === "CEO" ||
+      auth?.position === "Office Manager"
     ) {
-      return res.status(403).json({ message: "No permission" });
+      return next();
     }
 
-    next();
+    return res.status(403).json({ message: "No permission" });
   } catch (error) {
     console.error("Authorization check failed:", error);
     res.status(500).json({ message: "Internal Server Error" });
